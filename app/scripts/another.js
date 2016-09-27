@@ -108,7 +108,7 @@ var another = {
             var leftToday = 17-today.getHours();
             var need = another.totalDurationInHours;
             var doin = (wholeDays*8 + leftToday);
-            $('#subheading').text("Need to do " + need + " hours work in " + doin + " hours");
+            $('#subheading').text("Need to do " + need + " hours work in " + doin + " hours (x" + (need/doin).toFixed(2) + " effort)");
             if(need > doin*1.2) $('#subheading').addClass('text-error');
             else if(need > doin * 1.01) $('#subheading').addClass('text-warning');
             else $('#subheading').addClass('text-success');
@@ -125,6 +125,14 @@ var another = {
           }
         });
       });
+    });
+  },
+
+  unassigned: function(){
+    Trello.get("search?query=-has:member is:open", function(res){
+      if(res.cards && res.cards.length>0){
+        $('#main').append("<h2>" + res.cards.length + " cards without assignment.</h2>");
+      }
     });
   },
 
@@ -156,6 +164,7 @@ var another = {
     console.log('Successful authentication');
     another.boards();
     another.newcards();
+    another.unassigned();
   },
 
   authenticationFailure: function() { console.log('Failed authentication'); },
