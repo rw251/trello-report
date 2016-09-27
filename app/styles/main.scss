@@ -3,11 +3,33 @@
 h1 {
     font-size: 2em;
     margin: 0.5em 0 1em;
+
     & > small {
         color: gray;
         font-size: 70%;
     }
 }
+
 .container {
     margin: 0 1em;
+}
+
+.text-success {
+    color: rgb(28, 184, 65);
+    /* this is a green */
+}
+
+.text-error {
+    color: rgb(202, 60, 60);
+    /* this is a maroon */
+}
+
+.text-warning {
+    color: rgb(223, 117, 20);
+    /* this is an orange */
+}
+
+.text-secondary {
+    color: rgb(66, 184, 221);
+    /* this is a light blue */
 }

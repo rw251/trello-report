@@ -24,6 +24,34 @@ var another = {
     });
   },
 
+  totalDurationInHours: 0,
+
+  calculateWorkingDays: function(fromDate, toDate) {
+    var workingDayCount = 0;
+
+    while (fromDate < toDate) {
+      fromDate.setDate(fromDate.getDate() + 1);
+      if (fromDate.getDay() >= 2 && fromDate.getDay() <= 5) {
+        ++workingDayCount;
+      }
+    }
+
+    return workingDayCount;
+  },
+
+  parseDuration: function(duration) {
+    var num = duration.slice(0, -1);
+    if (duration.search(/^[0-9]+h$/) > -1) {
+      another.totalDurationInHours += +num;
+      return num + " hour" + (num === "1" ? "" : "s");
+    } else if (duration.search(/^[0-9]+d$/) > -1) {
+      another.totalDurationInHours += (+num * 8);
+      return num + " day" + (num === "1" ? "" : "s");
+    } else {
+      return duration + " is badly formed expecting Xh or Yd";
+    }
+  },
+
   newcards: function() {
     Trello.get("members/me/cards/open", function(cards) {
       another.allCards = cards;
@@ -43,6 +71,11 @@ var another = {
             another.allCards = cards.map(function(v) {
               v.listname = another.listnames[v.idList];
               v.boardname = another.boardnames[v.idBoard];
+              var bracket = v.name.indexOf('[');
+              if (bracket > -1 && v.name.length - bracket < 10) {
+                v.duration = another.parseDuration(v.name.substr(bracket, 10).replace(/[\[\]]/g, ""));
+                v.name = v.name.substr(0, bracket);
+              }
               return v;
             }).sort(function(a, b) {
               //sort order
@@ -52,18 +85,27 @@ var another = {
                 //by due Date
                 if (a.due === b.due) {
                   //by project
-                  if(a.boardname===b.boardname) return 0;
-                  if(a.boardname > b.boardname) return 1;
+                  if (a.boardname === b.boardname) return 0;
+                  if (a.boardname > b.boardname) return 1;
                   return -1;
                 }
-                if(!a.due) return 1;
-                if(!b.due) return -1;
+                if (!a.due) return 1;
+                if (!b.due) return -1;
                 return new Date(a.due) - new Date(b.due);
               } else {
                 return orderList.indexOf(b.listname) - orderList.indexOf(a.listname);
               }
             });
             var tmpl = require("templates/listOfTasks");
+            var today = new Date();
+            var wholeDays = another.calculateWorkingDays(today, new Date('2016-11-23'));
+            var leftToday = 17-today.getHours();
+            var need = another.totalDurationInHours;
+            var doin = (wholeDays*8 + leftToday);
+            $('#subheading').text("Need to do " + need + " hours work in " + doin + " hours");
+            if(need > doin*1.2) $('#subheading').addClass('text-error');
+            else if(need > doin * 1.01) $('#subheading').addClass('text-warning');
+            else $('#subheading').addClass('text-success');
             $('#main').append(tmpl({
               tasks: another.allCards
             }));
@@ -76,7 +118,6 @@ var another = {
   listname: function(listId, callback) {
     if (another.listnames[listId]) return callback(another.listnames[listId]);
     Trello.get("lists/" + listId + "/name", function(name) {
-      console.log(name._value);
       another.listnames[listId] = name._value;
       return callback(name._value);
     }, function(err) {
