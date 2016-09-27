@@ -1,13 +1,14 @@
 include partials/task
 
-table.pure-table
-  thead
-    tr
-      th Board
-      th Name
-      th Expected duration
-      th List
-      th Due by
-  tbody
-    each task in tasks
-      +task(task)
+.l-box
+  table.pure-table.responsive
+    thead
+      tr
+        th Board
+        th Name
+        th Expected duration
+        th List
+        th Due by
+    tbody
+      each task in tasks
+        +task(task)

@@ -10,6 +10,48 @@ h1 {
     }
 }
 
+.l-box {
+    padding: 1em;
+}
+@media (max-width: 600px) {
+    table {
+        margin: auto;
+    }
+
+    table.responsive {
+        border: 0;
+    }
+
+    table.responsive thead {
+        display: none;
+    }
+
+    table.responsive tr {
+        margin-bottom: 10px;
+        display: block;
+        border: 2px solid #ddd;
+    }
+
+    table.responsive td {
+        display: block;
+        text-align: right;
+        font-size: 13px;
+        border: 0;
+        border-bottom: 1px dotted #ccc;
+    }
+
+    table.responsive td:last-child {
+        border-bottom: 0;
+    }
+
+    table.responsive td:before {
+        content: attr(data-label);
+        float: left;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+}
+
 .container {
     margin: 0 1em;
 }

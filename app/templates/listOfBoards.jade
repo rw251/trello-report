@@ -1,0 +1,11 @@
+include partials/board
+
+.l-box
+  table.pure-table
+    thead
+      tr
+        th Board name
+        th Total expected duration
+    tbody
+      each board in boards
+        +board(board)

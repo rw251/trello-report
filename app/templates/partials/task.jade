@@ -1,7 +1,7 @@
 mixin task(task)
   tr.task
-    td= task.boardname
-    td= task.name
-    td= task.duration
-    td= task.listname
-    td= task.due ? (new Date(task.due)).toISOString().substr(0,10) : "-"
+    td(data-label='Board')= task.boardname
+    td(data-label='Task')= task.name
+    td(data-label='Time')= task.duration
+    td(data-label='List')= task.listname
+    td(data-label='Due')= task.due ? (new Date(task.due)).toISOString().substr(0,10) : "-"

@@ -39,13 +39,19 @@ var another = {
     return workingDayCount;
   },
 
-  parseDuration: function(duration) {
+  parseDuration: function(duration, boardName) {
+    var b = another.allBoards.filter(function(v){
+      return v.name===boardName;
+    })[0];
+    if(!b.duration) b.duration=0;
     var num = duration.slice(0, -1);
     if (duration.search(/^[0-9]+h$/) > -1) {
       another.totalDurationInHours += +num;
+      b.duration += +num;
       return num + " hour" + (num === "1" ? "" : "s");
     } else if (duration.search(/^[0-9]+d$/) > -1) {
       another.totalDurationInHours += (+num * 8);
+      b.duration += (+num * 8);
       return num + " day" + (num === "1" ? "" : "s");
     } else {
       return duration + " is badly formed expecting Xh or Yd";
@@ -73,7 +79,7 @@ var another = {
               v.boardname = another.boardnames[v.idBoard];
               var bracket = v.name.indexOf('[');
               if (bracket > -1 && v.name.length - bracket < 10) {
-                v.duration = another.parseDuration(v.name.substr(bracket, 10).replace(/[\[\]]/g, ""));
+                v.duration = another.parseDuration(v.name.substr(bracket, 10).replace(/[\[\]]/g, ""), v.boardname);
                 v.name = v.name.substr(0, bracket);
               }
               return v;
@@ -96,7 +102,7 @@ var another = {
                 return orderList.indexOf(b.listname) - orderList.indexOf(a.listname);
               }
             });
-            var tmpl = require("templates/listOfTasks");
+
             var today = new Date();
             var wholeDays = another.calculateWorkingDays(today, new Date('2016-11-23'));
             var leftToday = 17-today.getHours();
@@ -106,6 +112,13 @@ var another = {
             if(need > doin*1.2) $('#subheading').addClass('text-error');
             else if(need > doin * 1.01) $('#subheading').addClass('text-warning');
             else $('#subheading').addClass('text-success');
+
+            var tmpl = require("templates/listOfBoards");
+            $('#main').append(tmpl({
+              boards: another.allBoards
+            }));
+
+            tmpl = require("templates/listOfTasks");
             $('#main').append(tmpl({
               tasks: another.allCards
             }));
