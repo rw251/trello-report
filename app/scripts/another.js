@@ -15,12 +15,13 @@ var another = {
         write: 'true'
       },
       expiration: 'never',
-      success: authenticationSuccess,
-      error: authenticationFailure
+      success: another.authenticationSuccess,
+      error: another.authenticationFailure
     });
   },
 
   doSomething: function() {
+    another.authorise();
     var tmpl = require("templates/listOfPeople");
     $('#main').append(tmpl({
       people: [
