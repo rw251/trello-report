@@ -1,0 +1,12 @@
+include partials/person
+
+p A dynamically added table from jade templates:
+table.pure-table
+  thead
+    tr
+      th Name
+      th Sex
+      th Age
+  tbody
+    each person in people
+      +person(person)
