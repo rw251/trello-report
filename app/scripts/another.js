@@ -2,6 +2,24 @@ var $ = require('jquery');
 
 var another = {
 
+  authenticationSuccess: function() { console.log('Successful authentication'); },
+
+  authenticationFailure: function() { console.log('Failed authentication'); },
+
+  authorise: function() {
+    Trello.authorize({
+      type: 'popup',
+      name: 'Getting Started Application',
+      scope: {
+        read: 'true',
+        write: 'true'
+      },
+      expiration: 'never',
+      success: authenticationSuccess,
+      error: authenticationFailure
+    });
+  },
+
   doSomething: function() {
     var tmpl = require("templates/listOfPeople");
     $('#main').append(tmpl({
