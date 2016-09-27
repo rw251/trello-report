@@ -1,4 +1,5 @@
 mixin board(board)
   tr.board
-    td= board.name
+    td
+      a(href=board.shortUrl, target='_blank')= board.name
     td= board.duration
