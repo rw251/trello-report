@@ -1,0 +1,12 @@
+include partials/task
+
+table.pure-table
+  thead
+    tr
+      th Board
+      th Name
+      th List
+      th Due by
+  tbody
+    each task in tasks
+      +task(task)

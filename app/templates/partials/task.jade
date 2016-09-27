@@ -1,0 +1,6 @@
+mixin task(task)
+  tr.task
+    td= task.boardname
+    td= task.name
+    td= task.listname
+    td= task.due ? (new Date(task.due)).toISOString().substr(0,10) : "-"
