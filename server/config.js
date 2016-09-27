@@ -1,11 +1,11 @@
 module.exports = {
   passport: {
-    secret: process.env.MUJO_PASSPORT_SECRET
+    secret: process.env.TRELLO_REPORT_PASSPORT_SECRET
   },
   server: {
-    port: process.env.MUJO_SERVER_PORT
+    port: process.env.TRELLO_REPORT_SERVER_PORT
   },
   mongo: {
-    url: process.env.MUJO_MONGO_URL
+    url: process.env.TRELLO_REPORT_MONGO_URL
   }
 };
