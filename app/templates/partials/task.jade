@@ -1,5 +1,7 @@
 mixin task(task)
-  tr.task
+  - var classes = ['task']
+  - if(task.listname==="Completed") classes.push('completed')
+  tr(class=classes)
     td(data-label='Board')= task.boardname
     td(data-label='Task')
       = task.name

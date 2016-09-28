@@ -40,10 +40,10 @@ var another = {
   },
 
   parseDuration: function(duration, boardName) {
-    var b = another.allBoards.filter(function(v){
-      return v.name===boardName;
+    var b = another.allBoards.filter(function(v) {
+      return v.name === boardName;
     })[0];
-    if(!b.duration) b.duration=0;
+    if (!b.duration) b.duration = 0;
     var num = duration.slice(0, -1);
     if (duration.search(/^[0-9]+h$/) > -1) {
       another.totalDurationInHours += +num;
@@ -72,13 +72,13 @@ var another = {
         another.listname(v, function(name) {
           soFar++;
           //var sort ordering
-          var orderList = ["Complete", "Waiting", "Tasks"];
+          var orderList = ["Completed", "Waiting", "Tasks"];
           if (soFar === finished) {
             another.allCards = cards.map(function(v) {
               v.listname = another.listnames[v.idList];
               v.boardname = another.boardnames[v.idBoard];
               var bracket = v.name.indexOf('[');
-              if (bracket > -1 && v.name.length - bracket < 10) {
+              if (bracket > -1 && v.name.length - bracket < 10 && v.listname !== "Completed") {
                 v.duration = another.parseDuration(v.name.substr(bracket, 10).replace(/[\[\]]/g, ""), v.boardname);
                 v.name = v.name.substr(0, bracket);
               }
@@ -105,12 +105,12 @@ var another = {
 
             var today = new Date();
             var wholeDays = another.calculateWorkingDays(today, new Date('2016-11-23'));
-            var leftToday = 17-today.getHours();
+            var leftToday = Math.min(8, Math.max(0, 17 - today.getHours()));
             var need = another.totalDurationInHours;
-            var doin = (wholeDays*8 + leftToday);
-            $('#subheading').text("Need to do " + need + " hours work in " + doin + " hours (x" + (need/doin).toFixed(2) + " effort)");
-            if(need > doin*1.2) $('#subheading').addClass('text-error');
-            else if(need > doin * 1.01) $('#subheading').addClass('text-warning');
+            var doin = (wholeDays * 8 + leftToday);
+            $('#subheading').text("Need to do " + need + " hours work in " + doin + " hours (x" + (need / doin).toFixed(2) + " effort)");
+            if (need > doin * 1.2) $('#subheading').addClass('text-error');
+            else if (need > doin * 1.01) $('#subheading').addClass('text-warning');
             else $('#subheading').addClass('text-success');
 
             var tmpl = require("templates/listOfBoards");
@@ -122,15 +122,17 @@ var another = {
             $('#main').append(tmpl({
               tasks: another.allCards
             }));
+
+            $('#main').append("<div>" + today + "</div>");
           }
         });
       });
     });
   },
 
-  unassigned: function(){
-    Trello.get("search?query=-has:member is:open", function(res){
-      if(res.cards && res.cards.length>0){
+  unassigned: function() {
+    Trello.get("search?query=-has:member is:open", function(res) {
+      if (res.cards && res.cards.length > 0) {
         $('#main').append("<h2>" + res.cards.length + " cards without assignment.</h2>");
       }
     });
