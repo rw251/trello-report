@@ -1,11 +1,12 @@
 include partials/board
 
-.l-box
-  table.pure-table
-    thead
-      tr
-        th Board name
-        th Total duration
-    tbody
-      each board in boards
-        +board(board)
+.pure-u-1.pure-u-md-1-2
+  .l-box
+    table.pure-table
+      thead
+        tr
+          th Board name
+          th Total duration
+      tbody
+        each board in boards
+          +board(board)

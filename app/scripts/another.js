@@ -24,6 +24,33 @@ var another = {
     });
   },
 
+  // 0 is this week, 1 is next week, -1 is last week, -n is n weeks ago etc.
+  getNWeek: function(dt) {
+
+    //
+    var today = new Date(),
+      ans = 0;
+    if (dt > today) {
+      while (dt >= today) {
+        dt.setDate(dt.getDate() - 1);
+        if (dt.getDay() === 1) ans++;
+      }
+    } else {
+      while (dt <= today) {
+        dt.setDate(dt.getDate() + 1);
+        if (dt.getDay() === 2) ans--;
+      }
+    }
+    return ans;
+  },
+
+  getWCDate: function(dt) {
+    while (dt.getDay() !== 2) {
+      dt.setDate(dt.getDate() - 1);
+    }
+    return dt;
+  },
+
   totalDurationInHours: 0,
 
   calculateWorkingDays: function(fromDate, toDate) {
@@ -48,13 +75,13 @@ var another = {
     if (duration.search(/^[0-9]+h$/) > -1) {
       another.totalDurationInHours += +num;
       b.duration += +num;
-      return num + " hour" + (num === "1" ? "" : "s");
+      return { hours: num, text: num + " hour" + (num === "1" ? "" : "s") };
     } else if (duration.search(/^[0-9]+d$/) > -1) {
       another.totalDurationInHours += (+num * 8);
       b.duration += (+num * 8);
-      return num + " day" + (num === "1" ? "" : "s");
+      return { hours: num * 8, text: num + " day" + (num === "1" ? "" : "s") };
     } else {
-      return duration + " is badly formed expecting Xh or Yd";
+      return { hours: 0, text: duration + " is badly formed expecting Xh or Yd" };
     }
   },
 
@@ -73,14 +100,22 @@ var another = {
           soFar++;
           //var sort ordering
           var orderList = ["Completed", "Waiting", "Tasks"];
+          var completedLog = {};
           if (soFar === finished) {
             another.allCards = cards.map(function(v) {
               v.listname = another.listnames[v.idList];
               v.boardname = another.boardnames[v.idBoard];
               var bracket = v.name.indexOf('[');
               if (bracket > -1 && v.name.length - bracket < 10 && v.listname !== "Completed") {
-                v.duration = another.parseDuration(v.name.substr(bracket, 10).replace(/[\[\]]/g, ""), v.boardname);
+                var vals = another.parseDuration(v.name.substr(bracket, 10).replace(/[\[\]]/g, ""), v.boardname);
+                v.durationHours = vals.hours;
+                v.durationText = vals.text;
                 v.name = v.name.substr(0, bracket);
+              } else if (v.listname === "Completed") {
+                var vals2 = another.parseDuration(v.name.substr(bracket, 10).replace(/[\[\]]/g, ""), v.boardname);
+                var wk = another.getNWeek(new Date(v.dateLastActivity));
+                if (!completedLog[wk]) completedLog[wk] = +vals2.hours;
+                else completedLog[wk] += +vals2.hours;
               }
               return v;
             }).sort(function(a, b) {
@@ -114,8 +149,18 @@ var another = {
             else $('#subheading').addClass('text-success');
 
             var tmpl = require("templates/listOfBoards");
-            $('#main').append(tmpl({
+            $('#top-row').append(tmpl({
               boards: another.allBoards
+            }));
+
+            tmpl = require("templates/listOfWeeks");
+            var completedData = Object.keys(completedLog).map(function(v) {
+              var t = new Date();
+              t.setDate(t.getDate() + (+v * 7));
+              return { wc: another.getWCDate(t).toISOString().substr(0,10), name: v, hours: completedLog[v] };
+            });
+            $('#top-row').append(tmpl({
+              weeks: completedData
             }));
 
             tmpl = require("templates/listOfTasks");

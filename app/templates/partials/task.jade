@@ -6,6 +6,6 @@ mixin task(task)
     td(data-label='Task')
       = task.name
       a(href=task.shortUrl,target='_blank') link
-    td(data-label='Time')= task.duration
+    td(data-label='Time',class=task.listname==="Completed" ? "" :"duration",style="background-size:" + (100*task.durationHours/(8*10)) + "% 100%")= task.durationText
     td(data-label='List')= task.listname
     td(data-label='Due')= task.due ? (new Date(task.due)).toISOString().substr(0,10) : "-"

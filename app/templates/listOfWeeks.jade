@@ -1,0 +1,12 @@
+include partials/week
+
+.pure-u-1.pure-u-md-1-2
+  .l-box
+    table.pure-table
+      thead
+        tr
+          th W/C
+          th Hours
+      tbody
+        each week in weeks
+          +week(week)

@@ -1,4 +1,5 @@
 @import 'pure';
+@import 'grids-responsive-min';
 
 h1 {
     font-size: 2em;
@@ -15,10 +16,17 @@ h1 {
 }
 
 tr.completed {
-  background: rgb(28, 184, 65);
-  color: white;
+    background: rgb(28, 184, 65);
+    color: white;
 }
 
+td.duration {
+    background-color: white;
+    /*fallback color*/
+    background-image: url("green.png");
+    background-size: 75% 100%;
+    background-repeat: no-repeat;
+}
 @media (max-width: 600px) {
     table {
         margin: auto;
