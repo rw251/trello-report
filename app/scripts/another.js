@@ -66,19 +66,23 @@ var another = {
     return workingDayCount;
   },
 
-  parseDuration: function(duration, boardName) {
+  parseDuration: function(duration, boardName, ignore) {
     var b = another.allBoards.filter(function(v) {
       return v.name === boardName;
     })[0];
     if (!b.duration) b.duration = 0;
     var num = duration.slice(0, -1);
     if (duration.search(/^[0-9]+h$/) > -1) {
-      another.totalDurationInHours += +num;
-      b.duration += +num;
+      if (!ignore) {
+        another.totalDurationInHours += +num;
+        b.duration += +num;
+      }
       return { hours: num, text: num + " hour" + (num === "1" ? "" : "s") };
     } else if (duration.search(/^[0-9]+d$/) > -1) {
-      another.totalDurationInHours += (+num * 8);
-      b.duration += (+num * 8);
+      if (!ignore) {
+        another.totalDurationInHours += (+num * 8);
+        b.duration += (+num * 8);
+      }
       return { hours: num * 8, text: num + " day" + (num === "1" ? "" : "s") };
     } else {
       return { hours: 0, text: duration + " is badly formed expecting Xh or Yd" };
@@ -112,7 +116,7 @@ var another = {
                 v.durationText = vals.text;
                 v.name = v.name.substr(0, bracket);
               } else if (v.listname === "Completed") {
-                var vals2 = another.parseDuration(v.name.substr(bracket, 10).replace(/[\[\]]/g, ""), v.boardname);
+                var vals2 = another.parseDuration(v.name.substr(bracket, 10).replace(/[\[\]]/g, ""), v.boardname, true);
                 var wk = another.getNWeek(new Date(v.dateLastActivity));
                 if (!completedLog[wk]) completedLog[wk] = +vals2.hours;
                 else completedLog[wk] += +vals2.hours;
@@ -157,7 +161,7 @@ var another = {
             var completedData = Object.keys(completedLog).map(function(v) {
               var t = new Date();
               t.setDate(t.getDate() + (+v * 7));
-              return { wc: another.getWCDate(t).toISOString().substr(0,10), name: v, hours: completedLog[v] };
+              return { wc: another.getWCDate(t).toISOString().substr(0, 10), name: v, hours: completedLog[v] };
             });
             $('#top-row').append(tmpl({
               weeks: completedData
