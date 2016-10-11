@@ -8,7 +8,7 @@ var another = {
   listnames: {},
   boardnames: {},
 
-  cards: function(boardId, name) {
+  /*cards: function(boardId, name) {
     Trello.get("boards/" + boardId + "/cards", function(cards) {
       console.log(cards.length + " cards found for " + name);
       //console.log(cards[0]);
@@ -22,7 +22,7 @@ var another = {
     }, function(err) {
 
     });
-  },
+  },*/
 
   // 0 is this week, 1 is next week, -1 is last week, -n is n weeks ago etc.
   getNWeek: function(dt) {
@@ -89,6 +89,25 @@ var another = {
     }
   },
 
+  completed:{},
+
+  actions: function(done) {
+    Trello.get("members/me/actions?filter=updateCard:idList", function(actions) {
+      var track = {};
+      actions.forEach(function(v) {
+        if (!track[v.data.card.id]) track[v.data.card.id] = [];
+        track[v.data.card.id].push(v);
+      });
+      Object.keys(track).forEach(function(v){
+        track[v].sort(function(a,b){
+          return new Date(b.date) - new Date(a.date);
+        });
+        if(track[v][0].data.listAfter.name==="Completed") another.completed[v] = track[v][0].date;
+      });
+      done();
+    });
+  },
+
   newcards: function() {
     Trello.get("members/me/cards/open", function(cards) {
       another.allCards = cards;
@@ -117,7 +136,7 @@ var another = {
                 v.name = v.name.substr(0, bracket);
               } else if (v.listname === "Completed") {
                 var vals2 = another.parseDuration(v.name.substr(bracket, 10).replace(/[\[\]]/g, ""), v.boardname, true);
-                var wk = another.getNWeek(new Date(v.dateLastActivity));
+                var wk = another.getNWeek(new Date(another.completed[v.id]));
                 if (!completedLog[wk]) completedLog[wk] = +vals2.hours;
                 else completedLog[wk] += +vals2.hours;
               }
@@ -162,6 +181,8 @@ var another = {
               var t = new Date();
               t.setDate(t.getDate() + (+v * 7));
               return { wc: another.getWCDate(t).toISOString().substr(0, 10), name: v, hours: completedLog[v] };
+            }).sort(function(a,b){
+              return new Date(b.wc) -  new Date(a.wc);
             });
             $('#top-row').append(tmpl({
               weeks: completedData
@@ -214,8 +235,10 @@ var another = {
   authenticationSuccess: function() {
     console.log('Successful authentication');
     another.boards();
-    another.newcards();
-    another.unassigned();
+    another.actions(function(){
+      another.newcards();
+      another.unassigned();
+    });
   },
 
   authenticationFailure: function() { console.log('Failed authentication'); },
