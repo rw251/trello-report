@@ -1,6 +1,33 @@
 @import 'pure';
 @import 'grids-responsive-min';
 
+.centeredHeader {
+  text-align: center;
+}
+
+.loading {
+  margin: auto;
+}
+
+table {
+  margin: auto;
+}
+
+.ignore {
+  text-decoration: line-through;
+  background-color: #f1f1f3
+}
+
+@media (min-width: 768px) {
+  .l-box.right {
+    float:right;
+  }
+
+  .l-box.left {
+    float:left;
+  }
+}
+
 h1 {
     font-size: 2em;
     margin: 0.5em 0 1em;

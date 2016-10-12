@@ -4,25 +4,10 @@ var another = {
 
   allCards: [],
   allBoards: [],
+  completedData: [],
 
   listnames: {},
   boardnames: {},
-
-  /*cards: function(boardId, name) {
-    Trello.get("boards/" + boardId + "/cards", function(cards) {
-      console.log(cards.length + " cards found for " + name);
-      //console.log(cards[0]);
-      cards.forEach(function(v) {
-        another.listname(v.idList, function(name) {
-          v.listName = name;
-          another.allCards.push(v);
-          console.log(another.allCards.length);
-        });
-      });
-    }, function(err) {
-
-    });
-  },*/
 
   // 0 is this week, 1 is next week, -1 is last week, -n is n weeks ago etc.
   getNWeek: function(dt) {
@@ -89,7 +74,7 @@ var another = {
     }
   },
 
-  completed:{},
+  completed: {},
 
   actions: function(done) {
     Trello.get("members/me/actions?filter=updateCard:idList", function(actions) {
@@ -98,11 +83,11 @@ var another = {
         if (!track[v.data.card.id]) track[v.data.card.id] = [];
         track[v.data.card.id].push(v);
       });
-      Object.keys(track).forEach(function(v){
-        track[v].sort(function(a,b){
+      Object.keys(track).forEach(function(v) {
+        track[v].sort(function(a, b) {
           return new Date(b.date) - new Date(a.date);
         });
-        if(track[v][0].data.listAfter.name==="Completed") another.completed[v] = track[v][0].date;
+        if (track[v][0].data.listAfter.name === "Completed") another.completed[v] = track[v][0].date;
       });
       done();
     });
@@ -164,40 +149,113 @@ var another = {
             var today = new Date();
             var wholeDays = another.calculateWorkingDays(today, new Date('2016-11-23'));
             var leftToday = Math.min(8, Math.max(0, 17 - today.getHours()));
-            var need = another.totalDurationInHours;
-            var doin = (wholeDays * 8 + leftToday);
-            $('#subheading').text("Need to do " + need + " hours work in " + doin + " hours (x" + (need / doin).toFixed(2) + " effort)");
-            if (need > doin * 1.2) $('#subheading').addClass('text-error');
-            else if (need > doin * 1.01) $('#subheading').addClass('text-warning');
-            else $('#subheading').addClass('text-success');
+            another.need = another.totalDurationInHours;
+            another.doin = (wholeDays * 8 + leftToday);
 
-            var tmpl = require("templates/listOfBoards");
-            $('#top-row').append(tmpl({
-              boards: another.allBoards
-            }));
+            another.displaySubheading();
 
-            tmpl = require("templates/listOfWeeks");
-            var completedData = Object.keys(completedLog).map(function(v) {
+            another.completedData = Object.keys(completedLog).map(function(v) {
               var t = new Date();
               t.setDate(t.getDate() + (+v * 7));
               return { wc: another.getWCDate(t).toISOString().substr(0, 10), name: v, hours: completedLog[v] };
-            }).sort(function(a,b){
-              return new Date(b.wc) -  new Date(a.wc);
+            }).sort(function(a, b) {
+              return new Date(b.wc) - new Date(a.wc);
             });
-            $('#top-row').append(tmpl({
-              weeks: completedData
-            }));
 
-            tmpl = require("templates/listOfTasks");
-            $('#main').append(tmpl({
-              tasks: another.allCards
-            }));
-
-            $('#main').append("<div>" + today + "</div>");
+            another.displayAll();
           }
         });
       });
     });
+  },
+  need: 0,
+  doin: 0,
+
+  changeTime: function(t, board) {
+    another.need += t;
+    another.displaySubheading();
+    another.allBoards.filter(function(v) {
+      return v.name === board;
+    })[0].duration += t;
+    another.displayTopRow();
+  },
+
+  changeBoard: function(t, board) {
+    another.need += t;
+    another.displaySubheading();
+    var bd = another.allBoards.filter(function(v) {
+      return v.name === board;
+    })[0];
+    bd.include = t<=0;
+    $('td:contains(' + board + ')').parent().toggleClass('ignore').find('input[type=checkbox]').prop('checked', !bd.include);
+    another.displayTopRow();
+  },
+
+  displaySubheading: function() {
+    $('#subheading').removeClass('text-error text-warning text-success').text("Need to do " + another.need + " hours work in " + another.doin + " hours (x" + (another.need / another.doin).toFixed(2) + " effort)");
+    if (another.need > another.doin * 1.2) $('#subheading').addClass('text-error');
+    else if (another.need > another.doin * 1.01) $('#subheading').addClass('text-warning');
+    else $('#subheading').addClass('text-success');
+  },
+
+  displayTopRow: function(fade) {
+    var tmpl = require("templates/listOfBoards");
+    if (fade) {
+      $('#top-row').fadeOut(800, function() {
+        $(this).html(tmpl({
+          boards: another.allBoards.filter(function(v){
+            return v.duration>=0;
+          })
+        }));
+
+        tmpl = require("templates/listOfWeeks");
+
+        $(this).append(tmpl({
+          weeks: another.completedData
+        }));
+        $(this).fadeIn(600);
+      });
+    } else {
+      $('#top-row').html(tmpl({
+        boards: another.allBoards.filter(function(v){
+          return v.duration>=0;
+        })
+      }));
+
+      tmpl = require("templates/listOfWeeks");
+
+      $('#top-row').append(tmpl({
+        weeks: another.completedData
+      }));
+    }
+  },
+
+  displayAll: function(){
+
+    var tmpl = require("templates/listOfBoards");
+    $('#content').fadeOut(800, function() {
+      $('#top-row').html(tmpl({
+        boards: another.allBoards.filter(function(v){
+          return v.duration>=0;
+        })
+      }));
+
+      tmpl = require("templates/listOfWeeks");
+
+      $('#top-row').append(tmpl({
+        weeks: another.completedData
+      }));
+
+      tmpl = require("templates/listOfTasks");
+      $(this).append(tmpl({
+        tasks: another.allCards
+      }));
+
+      $(this).append("<div>" + (new Date()) + "</div>");
+
+      $(this).fadeIn(600);
+    });
+
   },
 
   unassigned: function() {
@@ -235,7 +293,7 @@ var another = {
   authenticationSuccess: function() {
     console.log('Successful authentication');
     another.boards();
-    another.actions(function(){
+    another.actions(function() {
       another.newcards();
       another.unassigned();
     });

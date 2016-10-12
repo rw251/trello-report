@@ -9,6 +9,11 @@ var App = {
 
     another.doSomething();
 
+    $('#main').on('click', 'td input.include', function() {
+      another.changeTime(this.checked ? +$(this).data('time') : -$(this).data('time'), $(this).data('board'));
+    }).on('click', 'td input.includeBoard', function() {
+      another.changeBoard(this.checked ? +$(this).data('time') : -$(this).data('time'), $(this).data('board'));
+    });
   }
 };
 

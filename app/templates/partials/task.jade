@@ -9,3 +9,5 @@ mixin task(task)
     td(data-label='Time',class=task.listname==="Completed" ? "" :"duration",style="background-size:" + (100*task.durationHours/(8*10)) + "% 100%")= task.durationText
     td(data-label='List')= task.listname
     td(data-label='Due')= task.due ? (new Date(task.due)).toISOString().substr(0,10) : "-"
+    td(data-label='Include')
+      input.include(type='checkbox',data-time=task.durationHours,data-board=task.boardname,checked=true)

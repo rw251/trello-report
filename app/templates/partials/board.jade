@@ -2,4 +2,6 @@ mixin board(board)
   tr.board
     td
       a(href=board.shortUrl, target='_blank')= board.name
-    td= board.duration
+    td= (board.include ? '0' : board.duration)
+    td
+      input.includeBoard(type='checkbox',data-time=board.duration,data-board=board.name,checked=(!board.include))
