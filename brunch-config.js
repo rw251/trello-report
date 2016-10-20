@@ -7,6 +7,9 @@ module.exports = {
 
   files: {
     javascripts: {
+      joinTo: {
+        'libraries.js': /^(?!(app|server)\/)/
+      },
       entryPoints: {
         'app/application.js': {
           'app.js': /^app\//
