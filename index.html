@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Better trello report for my purposes">
+
+  <title>Treport</title>
+  <link rel="stylesheet" href="app.css">
+
+  <script src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <script src="https://api.trello.com/1/client.js?key=30acc2745c37b886dd1a41476fce9a71"></script>
+</head>
+
+<body>
+  <section id="main" class="container">
+    <div class="centeredHeader">
+      <h1>Task list <small id="subheading"></small></h1>
+    </div>
+    <div id="content">
+      <div class="pure-g" id="top-row">
+        <img class="loading" src="box.gif" alt="Little rotating box showing loading" />
+      </div>
+    </div>
+  </section>
+
+  <script src="libraries.js"></script>
+  <script src="app.js"></script>
+  <script>
+    require("application").init();
+  </script>
+</body>
+
+</html>
