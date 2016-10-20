@@ -304,7 +304,7 @@ var another = {
   authorise: function() {
     Trello.authorize({
       type: 'redirect',
-      name: 'Getting Started Application',
+      name: 'Trello report',
       scope: {
         read: 'true',
         write: 'true'
