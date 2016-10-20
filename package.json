@@ -38,7 +38,11 @@
     "postinstall": "npm run build",
     "watch": "brunch watch",
     "predebug": "echo In one window launch brunch without server: npm run watch",
-    "debug": "echo Then in second window launch server with debug: node-debug server.js"
+    "debug": "echo Then in second window launch server with debug: node-debug server.js",
+
+    "predeploy": "cd dist && git pull origin gh-pages",
+    "deploy": "npm run build",
+    "postdeploy" :"cd dist && git add -A && git commit -m \"Latest test version\" && git push origin gh-pages"
   },
   "author": "",
   "license": "ISC"
