@@ -204,7 +204,7 @@ var another = {
       $('#top-row').fadeOut(800, function() {
         $(this).html(tmpl({
           boards: another.allBoards.filter(function(v){
-            return v.duration>=0;
+            return v.duration>0;
           })
         }));
 
@@ -218,7 +218,7 @@ var another = {
     } else {
       $('#top-row').html(tmpl({
         boards: another.allBoards.filter(function(v){
-          return v.duration>=0;
+          return v.duration>0;
         })
       }));
 
@@ -236,7 +236,7 @@ var another = {
     $('#content').fadeOut(800, function() {
       $('#top-row').html(tmpl({
         boards: another.allBoards.filter(function(v){
-          return v.duration>=0;
+          return v.duration>0;
         })
       }));
 
